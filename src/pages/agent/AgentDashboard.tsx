@@ -1,20 +1,23 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Users, DollarSign, AlertCircle, CheckCircle } from "lucide-react";
+import { Menu, Bell, Users, DollarSign, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   getCustomersByAgent,
   getTodaysCollections,
   calculateDueAmount,
   mockCustomers,
+  mockAgents,
 } from "@/data/mockData";
 import { useMemo } from "react";
-import { CollectionChart } from "@/components/CollectionChart";
+import { CircularProgress } from "@/components/CircularProgress";
+import { BottomNav } from "@/components/BottomNav";
 
 const AgentDashboard = () => {
   const navigate = useNavigate();
   const currentAgentId = localStorage.getItem("currentAgentId") || "A001";
+  const agent = mockAgents.find((a) => a.id === currentAgentId);
   
   const customers = useMemo(() => getCustomersByAgent(currentAgentId), [currentAgentId]);
   const todaysCollections = useMemo(() => getTodaysCollections(), []);
@@ -32,11 +35,15 @@ const AgentDashboard = () => {
       (c) => (c.status === "active" || c.status === "overdue") && calculateDueAmount(c) > 0
     ).length;
 
+    const completedCount = customers.filter((c) => c.status === "completed").length;
+    const completionRate = customers.length > 0 ? Math.round((completedCount / customers.length) * 100) : 0;
+
     return {
       totalCustomers: customers.length,
       totalDue,
       todaysCollected,
       pendingCount,
+      completionRate,
     };
   }, [customers, todaysCollections, currentAgentId]);
 
@@ -44,129 +51,130 @@ const AgentDashboard = () => {
     (c) => (c.status === "active" || c.status === "overdue") && calculateDueAmount(c) > 0
   );
 
-  const weeklyData = useMemo(() => {
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    return days.map((day, index) => ({
-      name: day,
-      value: Math.floor(Math.random() * 5000) + 2000,
-    }));
-  }, []);
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="gradient-primary text-primary-foreground p-4 shadow-medium">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Header */}
+      <div className="p-4 pb-6">
         <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/")}
-            className="text-primary-foreground hover:bg-primary/80"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-bold">Agent Dashboard</h1>
-          <div className="w-10" />
+          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+            <Menu className="w-5 h-5 text-foreground" />
+          </button>
+          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+            <Bell className="w-5 h-5 text-foreground" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <Users className="w-4 h-4" />
+        <div className="mb-4">
+          <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <h1 className="text-2xl font-bold text-foreground">Good day, {agent?.name.split(' ')[0]}!</h1>
+        </div>
+
+        {/* Plan Card */}
+        <div className="grid grid-cols-1 gap-3 mb-4">
+          <Card className="card-elevated p-6 gradient-primary text-primary-foreground relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-sm opacity-90 mb-1">My Plan</p>
+                <p className="text-lg font-semibold mb-1">For Today</p>
+                <p className="text-xs opacity-75">{stats.pendingCount} of {stats.totalCustomers} Completed</p>
               </div>
-              <span>Customers</span>
+              <CircularProgress 
+                percentage={stats.completionRate} 
+                size={100}
+                strokeWidth={6}
+              />
             </div>
-            <p className="text-3xl font-bold text-primary-foreground">{stats.totalCustomers}</p>
+          </Card>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <Card className="card-elevated p-4 text-center">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <p className="text-2xl font-bold text-foreground mb-1">{stats.totalCustomers}</p>
+            <p className="text-xs text-muted-foreground">Customers</p>
+          </Card>
+          
+          <Card className="card-elevated p-4 text-center">
+            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-2">
+              <DollarSign className="w-5 h-5 text-success" />
+            </div>
+            <p className="text-2xl font-bold text-foreground mb-1">₹{Math.floor(stats.todaysCollected / 1000)}k</p>
+            <p className="text-xs text-muted-foreground">Collected</p>
           </Card>
 
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <AlertCircle className="w-4 h-4" />
-              </div>
-              <span>Pending</span>
+          <Card className="card-elevated p-4 text-center">
+            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-2">
+              <TrendingUp className="w-5 h-5 text-destructive" />
             </div>
-            <p className="text-3xl font-bold text-primary-foreground">{stats.pendingCount}</p>
-          </Card>
-
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <DollarSign className="w-4 h-4" />
-              </div>
-              <span>Total Due</span>
-            </div>
-            <p className="text-3xl font-bold text-primary-foreground">₹{stats.totalDue.toFixed(0)}</p>
-          </Card>
-
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <CheckCircle className="w-4 h-4" />
-              </div>
-              <span>Collected</span>
-            </div>
-            <p className="text-3xl font-bold text-primary-foreground">₹{stats.todaysCollected.toFixed(0)}</p>
+            <p className="text-2xl font-bold text-foreground mb-1">{stats.pendingCount}</p>
+            <p className="text-xs text-muted-foreground">Pending</p>
           </Card>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        <CollectionChart title="This Week's Collections" data={weeklyData} />
-
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Due Today</h2>
-          <Button size="sm" onClick={() => navigate("/agent/customers")}>
+      {/* Today Activity */}
+      <div className="px-4 space-y-3">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-foreground">Today Activity</h2>
+          <button 
+            onClick={() => navigate("/agent/customers")}
+            className="text-sm text-primary font-medium"
+          >
             View All
-          </Button>
+          </button>
         </div>
 
         <div className="space-y-3">
           {dueToday.length === 0 ? (
-            <Card className="p-6 shadow-soft">
-              <p className="text-center text-muted-foreground">No pending collections for today</p>
+            <Card className="card-elevated p-6">
+              <p className="text-center text-muted-foreground text-sm">No pending collections for today</p>
             </Card>
           ) : (
-            dueToday.map((customer) => {
+            dueToday.slice(0, 5).map((customer, index) => {
               const dueAmount = calculateDueAmount(customer);
+              const isCompleted = dueAmount === 0;
               return (
-                <Card
+                <div
                   key={customer.id}
-                  className="p-4 cursor-pointer hover:border-primary transition-all hover:shadow-medium"
+                  className="flex items-start gap-3 cursor-pointer"
                   onClick={() => navigate(`/agent/collect/${customer.id}`)}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <h3 className="font-semibold text-card-foreground">{customer.name}</h3>
-                      <p className="text-sm text-muted-foreground">{customer.mobile}</p>
+                  {/* Timeline dot */}
+                  <div className="flex flex-col items-center mt-1">
+                    <div className={`w-3 h-3 rounded-full ${isCompleted ? 'bg-primary' : 'bg-muted-foreground'}`} />
+                    {index < dueToday.length - 1 && (
+                      <div className="w-0.5 h-12 bg-muted mt-1" />
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <Card className="card-elevated flex-1 p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-card-foreground">{customer.name}</h3>
+                        <p className="text-xs text-muted-foreground capitalize">{customer.chitType} • {customer.mobile}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-foreground">
+                          {dueAmount > 0 ? `₹${dueAmount.toFixed(0)}` : '06:30'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {customer.paidDays}/{customer.totalDays} days
+                        </p>
+                      </div>
                     </div>
-                    <Badge variant={customer.status === "overdue" ? "destructive" : "default"}>
-                      {customer.chitType}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Due Amount:</span>
-                    <span className="font-semibold text-destructive">₹{dueAmount.toFixed(0)}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Paid: {customer.paidDays}/{customer.totalDays} days</span>
-                    <span className="text-muted-foreground">₹{customer.totalPaidAmount}</span>
-                  </div>
-                </Card>
+                  </Card>
+                </div>
               );
             })
           )}
         </div>
-
-        <Button
-          className="w-full gradient-primary shadow-medium"
-          size="lg"
-          onClick={() => navigate("/agent/customers")}
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Record Collection
-        </Button>
       </div>
+
+      <BottomNav role="agent" />
     </div>
   );
 };

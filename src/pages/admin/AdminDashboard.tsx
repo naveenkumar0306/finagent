@@ -1,17 +1,20 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, UserCog, DollarSign, AlertTriangle, TrendingUp, FileText } from "lucide-react";
+import { Menu, Bell, Users, UserCog, DollarSign, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { mockCustomers, mockAgents, getTodaysCollections, calculateDueAmount } from "@/data/mockData";
 import { useMemo } from "react";
-import { CollectionChart } from "@/components/CollectionChart";
+import { CircularProgress } from "@/components/CircularProgress";
+import { BottomNav } from "@/components/BottomNav";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const stats = useMemo(() => {
+    const totalCustomers = mockCustomers.length;
     const activeCustomers = mockCustomers.filter((c) => c.status !== "completed").length;
+    const completedCustomers = mockCustomers.filter((c) => c.status === "completed").length;
     const activeAgents = mockAgents.filter((a) => a.status === "active").length;
     
     const todaysCollections = getTodaysCollections();
@@ -26,97 +29,96 @@ const AdminDashboard = () => {
     ).length;
 
     const totalCollections = mockCustomers.reduce((sum, c) => sum + c.totalPaidAmount, 0);
+    const totalExpected = mockCustomers.reduce((sum, c) => sum + c.chitValue, 0);
+    const collectionRate = totalExpected > 0 ? Math.round((totalCollections / totalExpected) * 100) : 0;
 
     return {
+      totalCustomers,
       activeCustomers,
+      completedCustomers,
       activeAgents,
       todaysCollected,
       totalDueToday,
       missedDues,
       totalCollections,
+      collectionRate,
     };
   }, []);
 
-  const recentCustomers = mockCustomers.slice(0, 5);
-
-  const monthlyData = useMemo(() => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-    return months.map((month) => ({
-      name: month,
-      value: Math.floor(Math.random() * 50000) + 20000,
-    }));
-  }, []);
+  const recentCustomers = mockCustomers.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="gradient-primary text-primary-foreground p-4 shadow-medium">
+    <div className="min-h-screen bg-background pb-24">
+      {/* Header */}
+      <div className="p-4 pb-6">
         <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/")}
-            className="text-primary-foreground hover:bg-primary/80"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-bold">Admin Dashboard</h1>
-          <div className="w-10" />
+          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+            <Menu className="w-5 h-5 text-foreground" />
+          </button>
+          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+            <Bell className="w-5 h-5 text-foreground" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <Users className="w-4 h-4" />
-              </div>
-              <span>Total Clients</span>
-            </div>
-            <p className="text-3xl font-bold text-primary-foreground">{stats.activeCustomers}</p>
-          </Card>
-
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <UserCog className="w-4 h-4" />
-              </div>
-              <span>Active Agents</span>
-            </div>
-            <p className="text-3xl font-bold text-primary-foreground">{stats.activeAgents}</p>
-          </Card>
-
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <DollarSign className="w-4 h-4" />
-              </div>
-              <span>Today's Due</span>
-            </div>
-            <p className="text-2xl font-bold text-primary-foreground">₹{stats.totalDueToday.toFixed(0)}</p>
-          </Card>
-
-          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
-              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-              <span>Collected</span>
-            </div>
-            <p className="text-2xl font-bold text-primary-foreground">₹{stats.todaysCollected.toFixed(0)}</p>
-          </Card>
+        <div className="mb-4">
+          <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
         </div>
-      </div>
 
-      <div className="p-4 space-y-4">
-        <CollectionChart
-          title="Monthly Collections"
-          data={monthlyData}
-          color="hsl(145 65% 45%)"
-        />
-
-        <Card className="p-4 shadow-medium">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-card-foreground">Summary</h3>
+        {/* Summary Card */}
+        <Card className="card-elevated p-6 gradient-primary text-primary-foreground mb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-sm opacity-90 mb-1">Overall Progress</p>
+              <p className="text-lg font-semibold mb-1">Collection Rate</p>
+              <p className="text-xs opacity-75">{stats.completedCustomers} of {stats.totalCustomers} Completed</p>
+            </div>
+            <CircularProgress 
+              percentage={stats.collectionRate} 
+              size={100}
+              strokeWidth={6}
+            />
           </div>
+        </Card>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          <Card className="card-elevated p-3 text-center">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+              <Users className="w-4 h-4 text-primary" />
+            </div>
+            <p className="text-xl font-bold text-foreground mb-0.5">{stats.totalCustomers}</p>
+            <p className="text-xs text-muted-foreground">Clients</p>
+          </Card>
+          
+          <Card className="card-elevated p-3 text-center">
+            <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-2">
+              <UserCog className="w-4 h-4 text-accent" />
+            </div>
+            <p className="text-xl font-bold text-foreground mb-0.5">{stats.activeAgents}</p>
+            <p className="text-xs text-muted-foreground">Agents</p>
+          </Card>
+
+          <Card className="card-elevated p-3 text-center">
+            <div className="w-9 h-9 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-2">
+              <DollarSign className="w-4 h-4 text-success" />
+            </div>
+            <p className="text-xl font-bold text-foreground mb-0.5">₹{Math.floor(stats.todaysCollected / 1000)}k</p>
+            <p className="text-xs text-muted-foreground">Today</p>
+          </Card>
+
+          <Card className="card-elevated p-3 text-center">
+            <div className="w-9 h-9 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-2">
+              <TrendingUp className="w-4 h-4 text-destructive" />
+            </div>
+            <p className="text-xl font-bold text-foreground mb-0.5">{stats.missedDues}</p>
+            <p className="text-xs text-muted-foreground">Overdue</p>
+          </Card>
+        </div>
+
+        {/* Summary Card */}
+        <Card className="card-elevated p-4 mb-4">
+          <h3 className="font-semibold text-card-foreground mb-3">Summary</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Total Collections:</span>
@@ -127,81 +129,70 @@ const AdminDashboard = () => {
               <span className="font-semibold text-destructive">{stats.missedDues} customers</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Collection Rate:</span>
-              <span className="font-semibold">
-                {((stats.todaysCollected / Math.max(stats.totalDueToday, 1)) * 100).toFixed(1)}%
-              </span>
+              <span className="text-muted-foreground">Today's Target:</span>
+              <span className="font-semibold">₹{stats.totalDueToday.toFixed(0)}</span>
             </div>
           </div>
         </Card>
 
+        {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
+          <button
+            className="card-elevated p-4 text-center hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/customers")}
           >
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-              <Users className="w-5 h-5 text-primary" />
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+              <Users className="w-6 h-6 text-primary" />
             </div>
-            <span className="text-sm font-medium">Customers</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
+            <span className="text-sm font-medium text-foreground">Customers</span>
+          </button>
+          
+          <button
+            className="card-elevated p-4 text-center hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/agents")}
           >
-            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mb-2">
-              <UserCog className="w-5 h-5 text-accent" />
+            <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-2">
+              <UserCog className="w-6 h-6 text-accent" />
             </div>
-            <span className="text-sm font-medium">Agents</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
-            onClick={() => navigate("/admin/reports")}
-          >
-            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center mb-2">
-              <FileText className="w-5 h-5 text-success" />
-            </div>
-            <span className="text-sm font-medium">Reports</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
-            onClick={() => navigate("/admin/reports")}
-          >
-            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
-              <AlertTriangle className="w-5 h-5 text-destructive" />
-            </div>
-            <span className="text-sm font-medium">Overdue</span>
-          </Button>
+            <span className="text-sm font-medium text-foreground">Agents</span>
+          </button>
         </div>
 
-        <div>
+        {/* Recent Activity */}
+        <div className="mt-6">
           <h3 className="font-semibold mb-3 text-foreground">Recent Customers</h3>
           <div className="space-y-2">
-            {recentCustomers.map((customer) => (
-              <Card key={customer.id} className="p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="font-medium text-sm text-card-foreground">{customer.name}</p>
-                    <p className="text-xs text-muted-foreground">{customer.id}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge variant={customer.status === "overdue" ? "destructive" : "secondary"} className="text-xs">
-                      {customer.status}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      ₹{customer.totalPaidAmount}/{customer.chitValue}
-                    </p>
-                  </div>
+            {recentCustomers.map((customer, index) => (
+              <div key={customer.id} className="flex items-start gap-3">
+                <div className="flex flex-col items-center mt-1">
+                  <div className={`w-3 h-3 rounded-full ${customer.status === 'completed' ? 'bg-primary' : 'bg-muted-foreground'}`} />
+                  {index < recentCustomers.length - 1 && (
+                    <div className="w-0.5 h-12 bg-muted mt-1" />
+                  )}
                 </div>
-              </Card>
+                <Card className="card-elevated flex-1 p-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm text-card-foreground">{customer.name}</p>
+                      <p className="text-xs text-muted-foreground">{customer.id} • {customer.mobile}</p>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant={customer.status === "overdue" ? "destructive" : "secondary"} className="text-xs mb-1">
+                        {customer.status}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground">
+                        ₹{customer.totalPaidAmount}/₹{customer.chitValue}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
       </div>
+
+      <BottomNav role="admin" />
     </div>
   );
 };
