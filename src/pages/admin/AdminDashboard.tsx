@@ -5,6 +5,7 @@ import { ArrowLeft, Users, UserCog, DollarSign, AlertTriangle, TrendingUp, FileT
 import { useNavigate } from "react-router-dom";
 import { mockCustomers, mockAgents, getTodaysCollections, calculateDueAmount } from "@/data/mockData";
 import { useMemo } from "react";
+import { CollectionChart } from "@/components/CollectionChart";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -38,9 +39,17 @@ const AdminDashboard = () => {
 
   const recentCustomers = mockCustomers.slice(0, 5);
 
+  const monthlyData = useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+    return months.map((month) => ({
+      name: month,
+      value: Math.floor(Math.random() * 50000) + 20000,
+    }));
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="bg-primary text-primary-foreground p-4">
+      <div className="gradient-primary text-primary-foreground p-4 shadow-medium">
         <div className="flex items-center justify-between mb-4">
           <Button
             variant="ghost"
@@ -55,42 +64,56 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-primary-foreground/10 border-primary-foreground/20 p-3">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-1">
-              <Users className="w-4 h-4" />
+          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
+            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
+              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                <Users className="w-4 h-4" />
+              </div>
               <span>Total Clients</span>
             </div>
-            <p className="text-2xl font-bold text-primary-foreground">{stats.activeCustomers}</p>
+            <p className="text-3xl font-bold text-primary-foreground">{stats.activeCustomers}</p>
           </Card>
 
-          <Card className="bg-primary-foreground/10 border-primary-foreground/20 p-3">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-1">
-              <UserCog className="w-4 h-4" />
+          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
+            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
+              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                <UserCog className="w-4 h-4" />
+              </div>
               <span>Active Agents</span>
             </div>
-            <p className="text-2xl font-bold text-primary-foreground">{stats.activeAgents}</p>
+            <p className="text-3xl font-bold text-primary-foreground">{stats.activeAgents}</p>
           </Card>
 
-          <Card className="bg-primary-foreground/10 border-primary-foreground/20 p-3">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-1">
-              <DollarSign className="w-4 h-4" />
+          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
+            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
+              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                <DollarSign className="w-4 h-4" />
+              </div>
               <span>Today's Due</span>
             </div>
-            <p className="text-xl font-bold text-primary-foreground">₹{stats.totalDueToday.toFixed(0)}</p>
+            <p className="text-2xl font-bold text-primary-foreground">₹{stats.totalDueToday.toFixed(0)}</p>
           </Card>
 
-          <Card className="bg-primary-foreground/10 border-primary-foreground/20 p-3">
-            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-1">
-              <TrendingUp className="w-4 h-4" />
+          <Card className="bg-primary-foreground/10 backdrop-blur border-primary-foreground/20 p-4 shadow-soft">
+            <div className="flex items-center gap-2 text-primary-foreground/80 text-xs mb-2">
+              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
+              </div>
               <span>Collected</span>
             </div>
-            <p className="text-xl font-bold text-primary-foreground">₹{stats.todaysCollected.toFixed(0)}</p>
+            <p className="text-2xl font-bold text-primary-foreground">₹{stats.todaysCollected.toFixed(0)}</p>
           </Card>
         </div>
       </div>
 
       <div className="p-4 space-y-4">
-        <Card className="p-4">
+        <CollectionChart
+          title="Monthly Collections"
+          data={monthlyData}
+          color="hsl(145 65% 45%)"
+        />
+
+        <Card className="p-4 shadow-medium">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-card-foreground">Summary</h3>
           </div>
@@ -115,35 +138,43 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-2 gap-3">
           <Button
             variant="outline"
-            className="h-20 flex-col"
+            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/customers")}
           >
-            <Users className="w-6 h-6 mb-2" />
-            <span className="text-xs">Customers</span>
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <span className="text-sm font-medium">Customers</span>
           </Button>
           <Button
             variant="outline"
-            className="h-20 flex-col"
+            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/agents")}
           >
-            <UserCog className="w-6 h-6 mb-2" />
-            <span className="text-xs">Agents</span>
+            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mb-2">
+              <UserCog className="w-5 h-5 text-accent" />
+            </div>
+            <span className="text-sm font-medium">Agents</span>
           </Button>
           <Button
             variant="outline"
-            className="h-20 flex-col"
+            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/reports")}
           >
-            <FileText className="w-6 h-6 mb-2" />
-            <span className="text-xs">Reports</span>
+            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center mb-2">
+              <FileText className="w-5 h-5 text-success" />
+            </div>
+            <span className="text-sm font-medium">Reports</span>
           </Button>
           <Button
             variant="outline"
-            className="h-20 flex-col"
+            className="h-24 flex-col shadow-soft hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/reports")}
           >
-            <AlertTriangle className="w-6 h-6 mb-2" />
-            <span className="text-xs">Overdue</span>
+            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+            </div>
+            <span className="text-sm font-medium">Overdue</span>
           </Button>
         </div>
 

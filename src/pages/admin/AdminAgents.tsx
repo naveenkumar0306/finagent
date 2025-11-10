@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, Users, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { mockAgents, mockCustomers, mockCollections } from "@/data/mockData";
 import { useMemo } from "react";
+import { AddAgentDialog } from "@/components/AddAgentDialog";
 
 const AdminAgents = () => {
   const navigate = useNavigate();
@@ -48,10 +49,7 @@ const AdminAgents = () => {
       </div>
 
       <div className="p-4 space-y-4">
-        <Button className="w-full">
-          <Plus className="w-4 h-4 mr-2" />
-          Add New Agent
-        </Button>
+        <AddAgentDialog />
 
         <div className="space-y-3">
           {agentStats.map((agent) => (

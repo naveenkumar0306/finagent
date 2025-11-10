@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AddCustomerDialog } from "@/components/AddCustomerDialog";
+import { EditCustomerDialog } from "@/components/EditCustomerDialog";
 
 const AdminCustomers = () => {
   const navigate = useNavigate();
@@ -99,10 +101,7 @@ const AdminCustomers = () => {
           </Select>
         </div>
 
-        <Button className="w-full">
-          <Plus className="w-4 h-4 mr-2" />
-          Add New Customer
-        </Button>
+        <AddCustomerDialog />
 
         <div className="space-y-3">
           {filteredCustomers.length === 0 ? (
@@ -170,9 +169,7 @@ const AdminCustomers = () => {
                     <Button variant="outline" size="sm" className="flex-1">
                       View Details
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      Edit
-                    </Button>
+                    <EditCustomerDialog customer={customer} />
                   </div>
                 </Card>
               );
