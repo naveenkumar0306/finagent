@@ -1,12 +1,18 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, Bell, Users, UserCog, DollarSign, TrendingUp } from "lucide-react";
+import { Menu, Bell, Users, UserCog, DollarSign, TrendingUp, Calendar, Target, AlertTriangle, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { mockCustomers, mockAgents, getTodaysCollections, calculateDueAmount } from "@/data/mockData";
 import { useMemo } from "react";
 import { CircularProgress } from "@/components/CircularProgress";
 import { BottomNav } from "@/components/BottomNav";
+import { MetricCard } from "@/components/widgets/MetricCard";
+import { WeeklyChart } from "@/components/widgets/WeeklyChart";
+import { MonthlyBreakdown } from "@/components/widgets/MonthlyBreakdown";
+import { WarningWidget } from "@/components/widgets/WarningWidget";
+import { AgentPerformance } from "@/components/widgets/AgentPerformance";
+import { RecentActivity } from "@/components/widgets/RecentActivity";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -24,13 +30,20 @@ const AdminDashboard = () => {
       .filter((c) => c.status === "active" || c.status === "overdue")
       .reduce((sum, c) => sum + calculateDueAmount(c), 0);
     
-    const missedDues = mockCustomers.filter(
-      (c) => c.status === "overdue" || (c.status === "active" && calculateDueAmount(c) > 0)
-    ).length;
+    const overdueCustomers = mockCustomers.filter((c) => c.status === "overdue");
+    const missedDues = overdueCustomers.length;
 
     const totalCollections = mockCustomers.reduce((sum, c) => sum + c.totalPaidAmount, 0);
     const totalExpected = mockCustomers.reduce((sum, c) => sum + c.chitValue, 0);
     const collectionRate = totalExpected > 0 ? Math.round((totalCollections / totalExpected) * 100) : 0;
+
+    // Weekly calculation
+    const weeklyTarget = 50000;
+    const weeklyCollected = 38500;
+
+    // Monthly calculation
+    const monthlyTarget = 200000;
+    const monthlyCollected = 145000;
 
     return {
       totalCustomers,
@@ -40,23 +53,129 @@ const AdminDashboard = () => {
       todaysCollected,
       totalDueToday,
       missedDues,
+      overdueCustomers,
       totalCollections,
       collectionRate,
+      weeklyTarget,
+      weeklyCollected,
+      monthlyTarget,
+      monthlyCollected,
     };
   }, []);
 
-  const recentCustomers = mockCustomers.slice(0, 3);
+  const weeklyData = useMemo(() => {
+    return [
+      { name: "Mon", value: 5200, target: 7000 },
+      { name: "Tue", value: 6800, target: 7000 },
+      { name: "Wed", value: 4500, target: 7000 },
+      { name: "Thu", value: 7200, target: 7000 },
+      { name: "Fri", value: 5800, target: 7000 },
+      { name: "Sat", value: 6000, target: 7000 },
+      { name: "Sun", value: 3000, target: 7000 },
+    ];
+  }, []);
+
+  const monthlyBreakdownData = useMemo(() => {
+    return [
+      { name: "Daily", value: 65000, color: "hsl(165 65% 55%)" },
+      { name: "Weekly", value: 45000, color: "hsl(200 65% 55%)" },
+      { name: "Monthly", value: 35000, color: "hsl(240 65% 55%)" },
+    ];
+  }, []);
+
+  const warnings = useMemo(() => {
+    return [
+      {
+        id: "1",
+        type: "overdue" as const,
+        title: "Overdue Payments",
+        subtitle: `${stats.overdueCustomers.length} customers have overdue payments`,
+        value: `₹${Math.floor(stats.totalDueToday / 1000)}k`,
+        severity: "high" as const,
+      },
+      {
+        id: "2",
+        type: "low_collection" as const,
+        title: "Below Target",
+        subtitle: "Weekly collection 23% below target",
+        value: "-23%",
+        severity: "medium" as const,
+      },
+      {
+        id: "3",
+        type: "pending" as const,
+        title: "Pending Follow-ups",
+        subtitle: "12 customers need follow-up calls",
+        value: "12",
+        severity: "low" as const,
+      },
+    ];
+  }, [stats]);
+
+  const agentPerformanceData = useMemo(() => {
+    return mockAgents.map((agent) => {
+      const customers = mockCustomers.filter((c) => c.agentId === agent.id);
+      const collected = Math.floor(Math.random() * 40000) + 20000;
+      const target = 50000;
+      return {
+        id: agent.id,
+        name: agent.name,
+        collected,
+        target,
+        customers: customers.length,
+        efficiency: Math.round((collected / target) * 100),
+      };
+    });
+  }, []);
+
+  const recentActivities = useMemo(() => {
+    return [
+      {
+        id: "1",
+        type: "collection" as const,
+        customerName: "Suresh Babu",
+        agentName: "Rajesh Kumar",
+        amount: 100,
+        time: "2 mins ago",
+      },
+      {
+        id: "2",
+        type: "collection" as const,
+        customerName: "Lakshmi Devi",
+        agentName: "Rajesh Kumar",
+        amount: 100,
+        time: "15 mins ago",
+      },
+      {
+        id: "3",
+        type: "missed" as const,
+        customerName: "Venkat Raman",
+        agentName: "Priya Singh",
+        amount: 1000,
+        time: "1 hour ago",
+      },
+      {
+        id: "4",
+        type: "pending" as const,
+        customerName: "Kumar Swamy",
+        agentName: "Amit Patel",
+        amount: 500,
+        time: "2 hours ago",
+      },
+    ];
+  }, []);
 
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="p-4 pb-6">
+      <div className="p-4 pb-4">
         <div className="flex items-center justify-between mb-4">
           <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
             <Menu className="w-5 h-5 text-foreground" />
           </button>
-          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center relative">
             <Bell className="w-5 h-5 text-foreground" />
+            <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-destructive" />
           </button>
         </div>
 
@@ -81,62 +200,76 @@ const AdminDashboard = () => {
           </div>
         </Card>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-4 gap-3 mb-6">
-          <Card className="card-elevated p-3 text-center">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-              <Users className="w-4 h-4 text-primary" />
-            </div>
-            <p className="text-xl font-bold text-foreground mb-0.5">{stats.totalCustomers}</p>
-            <p className="text-xs text-muted-foreground">Clients</p>
-          </Card>
-          
-          <Card className="card-elevated p-3 text-center">
-            <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-2">
-              <UserCog className="w-4 h-4 text-accent" />
-            </div>
-            <p className="text-xl font-bold text-foreground mb-0.5">{stats.activeAgents}</p>
-            <p className="text-xs text-muted-foreground">Agents</p>
-          </Card>
-
-          <Card className="card-elevated p-3 text-center">
-            <div className="w-9 h-9 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-2">
-              <DollarSign className="w-4 h-4 text-success" />
-            </div>
-            <p className="text-xl font-bold text-foreground mb-0.5">₹{Math.floor(stats.todaysCollected / 1000)}k</p>
-            <p className="text-xs text-muted-foreground">Today</p>
-          </Card>
-
-          <Card className="card-elevated p-3 text-center">
-            <div className="w-9 h-9 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-2">
-              <TrendingUp className="w-4 h-4 text-destructive" />
-            </div>
-            <p className="text-xl font-bold text-foreground mb-0.5">{stats.missedDues}</p>
-            <p className="text-xs text-muted-foreground">Overdue</p>
-          </Card>
+        {/* Main Metrics */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <MetricCard
+            title="Total Customers"
+            value={stats.totalCustomers}
+            subtitle={`${stats.activeCustomers} active`}
+            icon={Users}
+            trend={{ value: 12, isPositive: true }}
+            colorClass="bg-primary/10 text-primary"
+          />
+          <MetricCard
+            title="Active Agents"
+            value={stats.activeAgents}
+            subtitle="All performing"
+            icon={UserCog}
+            colorClass="bg-accent/10 text-accent"
+          />
+          <MetricCard
+            title="Today's Collection"
+            value={`₹${Math.floor(stats.todaysCollected / 1000)}k`}
+            subtitle={`Target: ₹${Math.floor(stats.totalDueToday / 1000)}k`}
+            icon={DollarSign}
+            trend={{ value: 8, isPositive: true }}
+            colorClass="bg-success/10 text-success"
+          />
+          <MetricCard
+            title="Overdue"
+            value={stats.missedDues}
+            subtitle="Customers"
+            icon={AlertTriangle}
+            trend={{ value: 3, isPositive: false }}
+            colorClass="bg-destructive/10 text-destructive"
+          />
         </div>
 
-        {/* Summary Card */}
-        <Card className="card-elevated p-4 mb-4">
-          <h3 className="font-semibold text-card-foreground mb-3">Summary</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Total Collections:</span>
-              <span className="font-semibold text-success">₹{stats.totalCollections.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Missed Dues:</span>
-              <span className="font-semibold text-destructive">{stats.missedDues} customers</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Today's Target:</span>
-              <span className="font-semibold">₹{stats.totalDueToday.toFixed(0)}</span>
-            </div>
-          </div>
-        </Card>
+        {/* Period Metrics */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <MetricCard
+            title="This Week"
+            value={`₹${(stats.weeklyCollected / 1000).toFixed(1)}k`}
+            subtitle={`Goal: ₹${(stats.weeklyTarget / 1000).toFixed(0)}k`}
+            icon={Calendar}
+            trend={{ value: 15, isPositive: true }}
+            colorClass="bg-blue-500/10 text-blue-500"
+          />
+          <MetricCard
+            title="This Month"
+            value={`₹${(stats.monthlyCollected / 1000).toFixed(0)}k`}
+            subtitle={`Goal: ₹${(stats.monthlyTarget / 1000).toFixed(0)}k`}
+            icon={Target}
+            trend={{ value: 22, isPositive: true }}
+            colorClass="bg-purple-500/10 text-purple-500"
+          />
+        </div>
+      </div>
+
+      {/* Charts and Widgets */}
+      <div className="px-4 space-y-4">
+        <WeeklyChart title="Weekly Collection Trend" data={weeklyData} />
+
+        <MonthlyBreakdown title="Collection by Chit Type" data={monthlyBreakdownData} />
+
+        <WarningWidget warnings={warnings} />
+
+        <AgentPerformance agents={agentPerformanceData} />
+
+        <RecentActivity activities={recentActivities} />
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 mt-6">
           <button
             className="card-elevated p-4 text-center hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/customers")}
@@ -144,7 +277,7 @@ const AdminDashboard = () => {
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
               <Users className="w-6 h-6 text-primary" />
             </div>
-            <span className="text-sm font-medium text-foreground">Customers</span>
+            <span className="text-sm font-medium text-foreground">Manage Customers</span>
           </button>
           
           <button
@@ -154,42 +287,11 @@ const AdminDashboard = () => {
             <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-2">
               <UserCog className="w-6 h-6 text-accent" />
             </div>
-            <span className="text-sm font-medium text-foreground">Agents</span>
+            <span className="text-sm font-medium text-foreground">Manage Agents</span>
           </button>
         </div>
 
-        {/* Recent Activity */}
-        <div className="mt-6">
-          <h3 className="font-semibold mb-3 text-foreground">Recent Customers</h3>
-          <div className="space-y-2">
-            {recentCustomers.map((customer, index) => (
-              <div key={customer.id} className="flex items-start gap-3">
-                <div className="flex flex-col items-center mt-1">
-                  <div className={`w-3 h-3 rounded-full ${customer.status === 'completed' ? 'bg-primary' : 'bg-muted-foreground'}`} />
-                  {index < recentCustomers.length - 1 && (
-                    <div className="w-0.5 h-12 bg-muted mt-1" />
-                  )}
-                </div>
-                <Card className="card-elevated flex-1 p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm text-card-foreground">{customer.name}</p>
-                      <p className="text-xs text-muted-foreground">{customer.id} • {customer.mobile}</p>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant={customer.status === "overdue" ? "destructive" : "secondary"} className="text-xs mb-1">
-                        {customer.status}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground">
-                        ₹{customer.totalPaidAmount}/₹{customer.chitValue}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            ))}
-          </div>
-        </div>
+        <div className="h-4" />
       </div>
 
       <BottomNav role="admin" />

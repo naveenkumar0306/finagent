@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, Bell, Users, DollarSign, TrendingUp } from "lucide-react";
+import { Menu, Bell, Users, DollarSign, TrendingUp, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   getCustomersByAgent,
@@ -13,6 +13,7 @@ import {
 import { useMemo } from "react";
 import { CircularProgress } from "@/components/CircularProgress";
 import { BottomNav } from "@/components/BottomNav";
+import { AddCustomerDialog } from "@/components/AddCustomerDialog";
 
 const AgentDashboard = () => {
   const navigate = useNavigate();
@@ -59,9 +60,19 @@ const AgentDashboard = () => {
           <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
             <Menu className="w-5 h-5 text-foreground" />
           </button>
-          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
-            <Bell className="w-5 h-5 text-foreground" />
-          </button>
+          <div className="flex items-center gap-2">
+            <AddCustomerDialog
+              trigger={
+                <button className="px-4 h-10 rounded-xl gradient-primary text-primary-foreground shadow-soft flex items-center gap-2 font-medium">
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">Add Customer</span>
+                </button>
+              }
+            />
+            <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+              <Bell className="w-5 h-5 text-foreground" />
+            </button>
+          </div>
         </div>
 
         <div className="mb-4">
