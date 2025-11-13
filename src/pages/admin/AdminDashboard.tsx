@@ -166,42 +166,42 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="p-4 pb-4">
-        <div className="flex items-center justify-between mb-4">
-          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
-            <Menu className="w-5 h-5 text-foreground" />
+      <div className="p-3 sm:p-4 pb-3 sm:pb-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+            <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
           </button>
-          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center relative">
-            <Bell className="w-5 h-5 text-foreground" />
+          <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-card shadow-soft flex items-center justify-center relative">
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
             <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-destructive" />
           </button>
         </div>
 
-        <div className="mb-4">
-          <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+        <div className="mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm text-muted-foreground">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Admin Dashboard</h1>
         </div>
 
         {/* Summary Card */}
-        <Card className="card-elevated p-6 gradient-primary text-primary-foreground mb-4">
+        <Card className="card-elevated p-4 sm:p-6 gradient-primary text-primary-foreground mb-3 sm:mb-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm opacity-90 mb-1">Overall Progress</p>
-              <p className="text-lg font-semibold mb-1">Collection Rate</p>
-              <p className="text-xs opacity-75">{stats.completedCustomers} of {stats.totalCustomers} Completed</p>
+              <p className="text-xs sm:text-sm opacity-90 mb-0.5 sm:mb-1">Overall Progress</p>
+              <p className="text-base sm:text-lg font-semibold mb-0.5 sm:mb-1">Collection Rate</p>
+              <p className="text-[10px] sm:text-xs opacity-75">{stats.completedCustomers} of {stats.totalCustomers} Completed</p>
             </div>
             <CircularProgress 
               percentage={stats.collectionRate} 
-              size={100}
+              size={90}
               strokeWidth={6}
             />
           </div>
         </Card>
 
         {/* Main Metrics */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
           <MetricCard
             title="Total Customers"
             value={stats.totalCustomers}
@@ -236,7 +236,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Period Metrics */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
           <MetricCard
             title="This Week"
             value={`₹${(stats.weeklyCollected / 1000).toFixed(1)}k`}
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Charts and Widgets */}
-      <div className="px-4 space-y-4">
+      <div className="px-3 sm:px-4 space-y-3 sm:space-y-4">
         <WeeklyChart title="Weekly Collection Trend" data={weeklyData} />
 
         <MonthlyBreakdown title="Collection by Chit Type" data={monthlyBreakdownData} />
@@ -269,25 +269,25 @@ const AdminDashboard = () => {
         <RecentActivity activities={recentActivities} />
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3 mt-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-4 sm:mt-6">
           <button
-            className="card-elevated p-4 text-center hover:shadow-medium transition-all"
+            className="card-elevated p-3 sm:p-4 text-center hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/customers")}
           >
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-              <Users className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             </div>
-            <span className="text-sm font-medium text-foreground">Manage Customers</span>
+            <span className="text-xs sm:text-sm font-medium text-foreground">Manage Customers</span>
           </button>
           
           <button
-            className="card-elevated p-4 text-center hover:shadow-medium transition-all"
+            className="card-elevated p-3 sm:p-4 text-center hover:shadow-medium transition-all"
             onClick={() => navigate("/admin/agents")}
           >
-            <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-2">
-              <UserCog className="w-6 h-6 text-accent" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+              <UserCog className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
             </div>
-            <span className="text-sm font-medium text-foreground">Manage Agents</span>
+            <span className="text-xs sm:text-sm font-medium text-foreground">Manage Agents</span>
           </button>
         </div>
 

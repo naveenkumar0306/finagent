@@ -160,4 +160,8 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-soft);
     border: none;
   }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

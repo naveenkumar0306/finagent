@@ -39,27 +39,27 @@ export const RecentActivity = ({ activities }: RecentActivityProps) => {
   };
 
   return (
-    <Card className="card-elevated p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-card-foreground">Recent Activity</h3>
-        <button className="text-xs text-primary font-medium">View All</button>
+    <Card className="card-elevated p-3 sm:p-4">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h3 className="text-sm sm:text-base font-semibold text-card-foreground">Recent Activity</h3>
+        <button className="text-[10px] sm:text-xs text-primary font-medium">View All</button>
       </div>
-      <div className="space-y-3">
+      <div className="space-y-2.5 sm:space-y-3">
         {activities.map((activity, index) => (
-          <div key={activity.id} className="flex items-start gap-3">
+          <div key={activity.id} className="flex items-start gap-2 sm:gap-3">
             <div className="flex flex-col items-center mt-0.5">
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted flex items-center justify-center">
                 {getIcon(activity.type)}
               </div>
               {index < activities.length - 1 && (
-                <div className="w-0.5 h-8 bg-muted mt-1" />
+                <div className="w-0.5 h-6 sm:h-8 bg-muted mt-1" />
               )}
             </div>
-            <div className="flex-1 pb-2">
+            <div className="flex-1 pb-1 sm:pb-2">
               <div className="flex items-start justify-between mb-1">
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">{activity.customerName}</p>
-                  <p className="text-xs text-muted-foreground">by {activity.agentName}</p>
+                <div className="flex-1 min-w-0 pr-2">
+                  <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{activity.customerName}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">by {activity.agentName}</p>
                 </div>
                 <Badge
                   variant={
@@ -69,14 +69,14 @@ export const RecentActivity = ({ activities }: RecentActivityProps) => {
                       ? "destructive"
                       : "secondary"
                   }
-                  className="text-xs"
+                  className="text-[10px] sm:text-xs"
                 >
                   {getTypeLabel(activity.type)}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-foreground">₹{activity.amount}</span>
-                <span className="text-xs text-muted-foreground">{activity.time}</span>
+                <span className="text-xs sm:text-sm font-bold text-foreground">₹{activity.amount}</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">{activity.time}</span>
               </div>
             </div>
           </div>
