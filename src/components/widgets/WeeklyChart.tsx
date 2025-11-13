@@ -8,21 +8,21 @@ interface WeeklyChartProps {
 
 export const WeeklyChart = ({ title, data }: WeeklyChartProps) => {
   return (
-    <Card className="card-elevated p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-card-foreground">{title}</h3>
-        <div className="flex items-center gap-3">
+    <Card className="card-elevated p-3 sm:p-4">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h3 className="text-sm sm:text-base font-semibold text-card-foreground">{title}</h3>
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-xs text-muted-foreground">Collected</span>
+            <span className="text-[10px] sm:text-xs text-muted-foreground">Collected</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-muted" />
-            <span className="text-xs text-muted-foreground">Target</span>
+            <span className="text-[10px] sm:text-xs text-muted-foreground">Target</span>
           </div>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={180}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">

@@ -53,31 +53,31 @@ const AgentDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="p-4 pb-6">
-        <div className="flex items-center justify-between mb-4">
-          <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
-            <Menu className="w-5 h-5 text-foreground" />
+      <div className="p-3 sm:p-4 pb-4 sm:pb-6">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+            <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
           </button>
           <div className="flex items-center gap-2">
             <AddCustomerDialog
               trigger={
-                <button className="px-4 h-10 rounded-xl gradient-primary text-primary-foreground shadow-soft flex items-center gap-2 font-medium">
-                  <Plus className="w-4 h-4" />
-                  <span className="text-sm">Add Customer</span>
+                <button className="px-3 sm:px-4 h-9 sm:h-10 rounded-xl gradient-primary text-primary-foreground shadow-soft flex items-center gap-1.5 sm:gap-2 font-medium">
+                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm">Add</span>
                 </button>
               }
             />
-            <button className="w-10 h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
-              <Bell className="w-5 h-5 text-foreground" />
+            <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-card shadow-soft flex items-center justify-center">
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
             </button>
           </div>
         </div>
 
-        <div className="mb-4">
-          <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-          <h1 className="text-2xl font-bold text-foreground">Good day, {agent?.name.split(' ')[0]}!</h1>
+        <div className="mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm text-muted-foreground">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Good day, {agent?.name.split(' ')[0]}!</h1>
         </div>
 
         {/* Plan Card */}
@@ -99,37 +99,37 @@ const AgentDashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <Card className="card-elevated p-4 text-center">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
-              <Users className="w-5 h-5 text-primary" />
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <Card className="card-elevated p-3 sm:p-4 text-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
-            <p className="text-2xl font-bold text-foreground mb-1">{stats.totalCustomers}</p>
-            <p className="text-xs text-muted-foreground">Customers</p>
+            <p className="text-lg sm:text-2xl font-bold text-foreground mb-0.5 sm:mb-1">{stats.totalCustomers}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Customers</p>
           </Card>
           
-          <Card className="card-elevated p-4 text-center">
-            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-2">
-              <DollarSign className="w-5 h-5 text-success" />
+          <Card className="card-elevated p-3 sm:p-4 text-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
             </div>
-            <p className="text-2xl font-bold text-foreground mb-1">₹{Math.floor(stats.todaysCollected / 1000)}k</p>
-            <p className="text-xs text-muted-foreground">Collected</p>
+            <p className="text-lg sm:text-2xl font-bold text-foreground mb-0.5 sm:mb-1">₹{Math.floor(stats.todaysCollected / 1000)}k</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Collected</p>
           </Card>
 
-          <Card className="card-elevated p-4 text-center">
-            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-2">
-              <TrendingUp className="w-5 h-5 text-destructive" />
+          <Card className="card-elevated p-3 sm:p-4 text-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
             </div>
-            <p className="text-2xl font-bold text-foreground mb-1">{stats.pendingCount}</p>
-            <p className="text-xs text-muted-foreground">Pending</p>
+            <p className="text-lg sm:text-2xl font-bold text-foreground mb-0.5 sm:mb-1">{stats.pendingCount}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">Pending</p>
           </Card>
         </div>
       </div>
 
       {/* Today Activity */}
-      <div className="px-4 space-y-3">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-foreground">Today Activity</h2>
+      <div className="px-3 sm:px-4 space-y-2 sm:space-y-3">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">Today Activity</h2>
           <button 
             onClick={() => navigate("/agent/customers")}
             className="text-sm text-primary font-medium"

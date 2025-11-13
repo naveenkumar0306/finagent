@@ -12,7 +12,6 @@ import CollectionEntry from "./pages/agent/CollectionEntry";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminAgents from "./pages/admin/AdminAgents";
-import AdminReports from "./pages/admin/AdminReports";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +29,6 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/customers" element={<AdminCustomers />} />
           <Route path="/admin/agents" element={<AdminAgents />} />
-          <Route path="/admin/reports" element={<AdminReports />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
