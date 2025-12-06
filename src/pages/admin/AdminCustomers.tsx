@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Search, Plus, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { mockCustomers, mockAgents } from "@/data/mockData";
+import { useData } from "@/contexts/DataContext";
 import { useState, useMemo } from "react";
 import {
   Select,
@@ -18,12 +18,13 @@ import { EditCustomerDialog } from "@/components/EditCustomerDialog";
 
 const AdminCustomers = () => {
   const navigate = useNavigate();
+  const { customers, agents } = useData();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [agentFilter, setAgentFilter] = useState<string>("all");
 
   const filteredCustomers = useMemo(() => {
-    let filtered = mockCustomers;
+    let filtered = customers;
 
     if (statusFilter !== "all") {
       filtered = filtered.filter((c) => c.status === statusFilter);
@@ -44,7 +45,7 @@ const AdminCustomers = () => {
     }
 
     return filtered;
-  }, [searchQuery, statusFilter, agentFilter]);
+  }, [customers, searchQuery, statusFilter, agentFilter]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -92,7 +93,7 @@ const AdminCustomers = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Agents</SelectItem>
-              {mockAgents.map((agent) => (
+              {agents.map((agent) => (
                 <SelectItem key={agent.id} value={agent.id}>
                   {agent.name}
                 </SelectItem>
@@ -110,7 +111,7 @@ const AdminCustomers = () => {
             </Card>
           ) : (
             filteredCustomers.map((customer) => {
-              const agent = mockAgents.find((a) => a.id === customer.agentId);
+              const agent = agents.find((a) => a.id === customer.agentId);
               const progress = (customer.paidDays / customer.totalDays) * 100;
               
               return (

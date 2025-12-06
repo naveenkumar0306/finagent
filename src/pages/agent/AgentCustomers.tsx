@@ -5,16 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowLeft, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getCustomersByAgent, calculateDueAmount, Customer } from "@/data/mockData";
+import { useData } from "@/contexts/DataContext";
+import { Customer } from "@/data/mockData";
 import { useMemo, useState } from "react";
 
 const AgentCustomers = () => {
   const navigate = useNavigate();
+  const { getCustomersByAgent, calculateDueAmount } = useData();
   const currentAgentId = localStorage.getItem("currentAgentId") || "A001";
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "due" | "overdue" | "completed">("all");
 
-  const customers = useMemo(() => getCustomersByAgent(currentAgentId), [currentAgentId]);
+  const customers = useMemo(() => getCustomersByAgent(currentAgentId), [getCustomersByAgent, currentAgentId]);
 
   const filteredCustomers = useMemo(() => {
     let filtered = customers;

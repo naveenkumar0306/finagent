@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { mockAgents, ChitType } from "@/data/mockData";
+import { ChitType } from "@/data/mockData";
+import { useData } from "@/contexts/DataContext";
 import { Plus } from "lucide-react";
 
 interface AddCustomerDialogProps {
@@ -15,6 +16,7 @@ interface AddCustomerDialogProps {
 export const AddCustomerDialog = ({ trigger }: AddCustomerDialogProps) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const { agents, addCustomer } = useData();
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -37,7 +39,17 @@ export const AddCustomerDialog = ({ trigger }: AddCustomerDialogProps) => {
       return;
     }
 
-    // In real app, this would save to backend
+    addCustomer({
+      name: formData.name,
+      mobile: formData.mobile,
+      address: formData.address,
+      chitType: formData.chitType,
+      chitValue: parseFloat(formData.chitValue),
+      totalDays: parseInt(formData.totalDays),
+      startDate: new Date().toISOString().split("T")[0],
+      agentId: formData.agentId,
+    });
+
     toast({
       title: "Customer Added",
       description: `${formData.name} has been added successfully`,
@@ -157,7 +169,7 @@ export const AddCustomerDialog = ({ trigger }: AddCustomerDialogProps) => {
                 <SelectValue placeholder="Select agent" />
               </SelectTrigger>
               <SelectContent>
-                {mockAgents.map((agent) => (
+                {agents.map((agent) => (
                   <SelectItem key={agent.id} value={agent.id}>
                     {agent.name} ({agent.id})
                   </SelectItem>

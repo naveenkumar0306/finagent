@@ -3,13 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Menu, Bell, Users, DollarSign, TrendingUp, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  getCustomersByAgent,
-  getTodaysCollections,
-  calculateDueAmount,
-  mockCustomers,
-  mockAgents,
-} from "@/data/mockData";
+import { useData } from "@/contexts/DataContext";
 import { useMemo } from "react";
 import { CircularProgress } from "@/components/CircularProgress";
 import { BottomNav } from "@/components/BottomNav";
@@ -17,11 +11,12 @@ import { AddCustomerDialog } from "@/components/AddCustomerDialog";
 
 const AgentDashboard = () => {
   const navigate = useNavigate();
+  const { agents, getCustomersByAgent, getTodaysCollections, calculateDueAmount } = useData();
   const currentAgentId = localStorage.getItem("currentAgentId") || "A001";
-  const agent = mockAgents.find((a) => a.id === currentAgentId);
+  const agent = agents.find((a) => a.id === currentAgentId);
   
-  const customers = useMemo(() => getCustomersByAgent(currentAgentId), [currentAgentId]);
-  const todaysCollections = useMemo(() => getTodaysCollections(), []);
+  const customers = useMemo(() => getCustomersByAgent(currentAgentId), [getCustomersByAgent, currentAgentId]);
+  const todaysCollections = useMemo(() => getTodaysCollections(), [getTodaysCollections]);
 
   const stats = useMemo(() => {
     const totalDue = customers

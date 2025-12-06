@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Menu, Bell, Users, UserCog, DollarSign, TrendingUp, Calendar, Target, AlertTriangle, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { mockCustomers, mockAgents, getTodaysCollections, calculateDueAmount } from "@/data/mockData";
+import { useData } from "@/contexts/DataContext";
 import { useMemo } from "react";
 import { CircularProgress } from "@/components/CircularProgress";
 import { BottomNav } from "@/components/BottomNav";
@@ -16,25 +16,26 @@ import { RecentActivity } from "@/components/widgets/RecentActivity";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { customers, agents, getTodaysCollections, calculateDueAmount } = useData();
 
   const stats = useMemo(() => {
-    const totalCustomers = mockCustomers.length;
-    const activeCustomers = mockCustomers.filter((c) => c.status !== "completed").length;
-    const completedCustomers = mockCustomers.filter((c) => c.status === "completed").length;
-    const activeAgents = mockAgents.filter((a) => a.status === "active").length;
+    const totalCustomers = customers.length;
+    const activeCustomers = customers.filter((c) => c.status !== "completed").length;
+    const completedCustomers = customers.filter((c) => c.status === "completed").length;
+    const activeAgents = agents.filter((a) => a.status === "active").length;
     
     const todaysCollections = getTodaysCollections();
     const todaysCollected = todaysCollections.reduce((sum, col) => sum + col.amount, 0);
     
-    const totalDueToday = mockCustomers
+    const totalDueToday = customers
       .filter((c) => c.status === "active" || c.status === "overdue")
       .reduce((sum, c) => sum + calculateDueAmount(c), 0);
     
-    const overdueCustomers = mockCustomers.filter((c) => c.status === "overdue");
+    const overdueCustomers = customers.filter((c) => c.status === "overdue");
     const missedDues = overdueCustomers.length;
 
-    const totalCollections = mockCustomers.reduce((sum, c) => sum + c.totalPaidAmount, 0);
-    const totalExpected = mockCustomers.reduce((sum, c) => sum + c.chitValue, 0);
+    const totalCollections = customers.reduce((sum, c) => sum + c.totalPaidAmount, 0);
+    const totalExpected = customers.reduce((sum, c) => sum + c.chitValue, 0);
     const collectionRate = totalExpected > 0 ? Math.round((totalCollections / totalExpected) * 100) : 0;
 
     // Weekly calculation
@@ -61,7 +62,7 @@ const AdminDashboard = () => {
       monthlyTarget,
       monthlyCollected,
     };
-  }, []);
+  }, [customers, agents, getTodaysCollections, calculateDueAmount]);
 
   const weeklyData = useMemo(() => {
     return [
@@ -113,20 +114,20 @@ const AdminDashboard = () => {
   }, [stats]);
 
   const agentPerformanceData = useMemo(() => {
-    return mockAgents.map((agent) => {
-      const customers = mockCustomers.filter((c) => c.agentId === agent.id);
-      const collected = Math.floor(Math.random() * 40000) + 20000;
-      const target = 50000;
+    return agents.map((agent) => {
+      const agentCustomers = customers.filter((c) => c.agentId === agent.id);
+      const collected = agentCustomers.reduce((sum, c) => sum + c.totalPaidAmount, 0);
+      const target = agentCustomers.reduce((sum, c) => sum + c.chitValue, 0);
       return {
         id: agent.id,
         name: agent.name,
         collected,
-        target,
-        customers: customers.length,
-        efficiency: Math.round((collected / target) * 100),
+        target: target || 50000,
+        customers: agentCustomers.length,
+        efficiency: target > 0 ? Math.round((collected / target) * 100) : 0,
       };
     });
-  }, []);
+  }, [agents, customers]);
 
   const recentActivities = useMemo(() => {
     return [
