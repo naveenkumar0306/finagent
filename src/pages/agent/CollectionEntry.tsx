@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { mockCustomers, calculateDueAmount, getRemainingAmount, getRemainingDays } from "@/data/mockData";
+import { useData } from "@/contexts/DataContext";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,8 +15,9 @@ const CollectionEntry = () => {
   const { customerId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { customers, addCollection, calculateDueAmount, getRemainingAmount, getRemainingDays } = useData();
   
-  const customer = mockCustomers.find((c) => c.id === customerId);
+  const customer = customers.find((c) => c.id === customerId);
   
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
@@ -56,7 +57,19 @@ const CollectionEntry = () => {
       return;
     }
 
-    // In real app, this would save to backend/localStorage
+    const currentAgentId = localStorage.getItem("currentAgentId") || "A001";
+    const daysPaid = formData.multiDay ? parseInt(formData.numDays) : 1;
+
+    addCollection({
+      customerId: customer.id,
+      agentId: currentAgentId,
+      date: formData.date,
+      amount: parseFloat(formData.amount),
+      daysPaid,
+      notes: formData.notes,
+      isPartial: parseFloat(formData.amount) < dailyAmount,
+    });
+
     toast({
       title: "Collection Recorded",
       description: `₹${formData.amount} collected from ${customer.name}`,
