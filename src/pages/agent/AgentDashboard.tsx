@@ -23,16 +23,15 @@ const AgentDashboard = () => {
       .filter((c) => c.status === "active" || c.status === "overdue")
       .reduce((sum, c) => sum + calculateDueAmount(c), 0);
     
-    const todaysCollected = todaysCollections
-      .filter((col) => col.agentId === currentAgentId)
-      .reduce((sum, col) => sum + col.amount, 0);
+    const agentTodaysCollections = todaysCollections.filter((col) => col.agentId === currentAgentId);
+    const todaysCollected = agentTodaysCollections.reduce((sum, col) => sum + col.amount, 0);
 
-    const pendingCount = customers.filter(
-      (c) => (c.status === "active" || c.status === "overdue") && calculateDueAmount(c) > 0
-    ).length;
+    const activeCustomers = customers.filter((c) => c.status === "active" || c.status === "overdue");
+    const collectedToday = agentTodaysCollections.map(col => col.customerId);
+    const pendingCount = activeCustomers.filter((c) => !collectedToday.includes(c.id)).length;
 
-    const completedCount = customers.filter((c) => c.status === "completed").length;
-    const completionRate = customers.length > 0 ? Math.round((completedCount / customers.length) * 100) : 0;
+    const completedToday = activeCustomers.length - pendingCount;
+    const completionRate = activeCustomers.length > 0 ? Math.round((completedToday / activeCustomers.length) * 100) : 0;
 
     return {
       totalCustomers: customers.length,
@@ -40,8 +39,10 @@ const AgentDashboard = () => {
       todaysCollected,
       pendingCount,
       completionRate,
+      completedToday,
+      activeCustomers: activeCustomers.length,
     };
-  }, [customers, todaysCollections, currentAgentId]);
+  }, [customers, todaysCollections, currentAgentId, calculateDueAmount]);
 
   const dueToday = customers.filter(
     (c) => (c.status === "active" || c.status === "overdue") && calculateDueAmount(c) > 0
@@ -82,7 +83,7 @@ const AgentDashboard = () => {
               <div className="flex-1">
                 <p className="text-sm opacity-90 mb-1">My Plan</p>
                 <p className="text-lg font-semibold mb-1">For Today</p>
-                <p className="text-xs opacity-75">{stats.pendingCount} of {stats.totalCustomers} Completed</p>
+                <p className="text-xs opacity-75">{stats.completedToday} of {stats.activeCustomers} Completed</p>
               </div>
               <CircularProgress 
                 percentage={stats.completionRate} 
@@ -107,7 +108,9 @@ const AgentDashboard = () => {
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
               <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
             </div>
-            <p className="text-lg sm:text-2xl font-bold text-foreground mb-0.5 sm:mb-1">₹{Math.floor(stats.todaysCollected / 1000)}k</p>
+            <p className="text-lg sm:text-2xl font-bold text-foreground mb-0.5 sm:mb-1">
+              {stats.todaysCollected >= 1000 ? `₹${(stats.todaysCollected / 1000).toFixed(1)}k` : `₹${stats.todaysCollected}`}
+            </p>
             <p className="text-[10px] sm:text-xs text-muted-foreground">Collected</p>
           </Card>
 

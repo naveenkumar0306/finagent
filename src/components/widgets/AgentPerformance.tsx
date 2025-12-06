@@ -51,7 +51,7 @@ export const AgentPerformance = ({ agents }: AgentPerformanceProps) => {
                     </span>
                   </div>
                   <p className="text-[10px] sm:text-xs text-muted-foreground">
-                    ₹{(agent.collected / 1000).toFixed(1)}k / ₹{(agent.target / 1000).toFixed(1)}k
+                    {agent.collected >= 1000 ? `₹${(agent.collected / 1000).toFixed(1)}k` : `₹${agent.collected}`} / {agent.target >= 1000 ? `₹${(agent.target / 1000).toFixed(1)}k` : `₹${agent.target}`}
                   </p>
                 </div>
               </div>
