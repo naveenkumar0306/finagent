@@ -91,7 +91,7 @@ const AdminDashboard = () => {
         type: "overdue" as const,
         title: "Overdue Payments",
         subtitle: `${stats.overdueCustomers.length} customers have overdue payments`,
-        value: `₹${Math.floor(stats.totalDueToday / 1000)}k`,
+        value: stats.totalDueToday >= 1000 ? `₹${(stats.totalDueToday / 1000).toFixed(1)}k` : `₹${stats.totalDueToday.toFixed(0)}`,
         severity: "high" as const,
       },
       {
@@ -130,41 +130,20 @@ const AdminDashboard = () => {
   }, [agents, customers]);
 
   const recentActivities = useMemo(() => {
-    return [
-      {
-        id: "1",
+    const todaysCollections = getTodaysCollections();
+    return todaysCollections.slice(0, 4).map((col, index) => {
+      const customer = customers.find(c => c.id === col.customerId);
+      const agent = agents.find(a => a.id === col.agentId);
+      return {
+        id: col.id,
         type: "collection" as const,
-        customerName: "Suresh Babu",
-        agentName: "Rajesh Kumar",
-        amount: 100,
-        time: "2 mins ago",
-      },
-      {
-        id: "2",
-        type: "collection" as const,
-        customerName: "Lakshmi Devi",
-        agentName: "Rajesh Kumar",
-        amount: 100,
-        time: "15 mins ago",
-      },
-      {
-        id: "3",
-        type: "missed" as const,
-        customerName: "Venkat Raman",
-        agentName: "Priya Singh",
-        amount: 1000,
-        time: "1 hour ago",
-      },
-      {
-        id: "4",
-        type: "pending" as const,
-        customerName: "Kumar Swamy",
-        agentName: "Amit Patel",
-        amount: 500,
-        time: "2 hours ago",
-      },
-    ];
-  }, []);
+        customerName: customer?.name || "Unknown",
+        agentName: agent?.name || "Unknown",
+        amount: col.amount,
+        time: index === 0 ? "Just now" : `${(index + 1) * 5} mins ago`,
+      };
+    });
+  }, [getTodaysCollections, customers, agents]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -220,8 +199,8 @@ const AdminDashboard = () => {
           />
           <MetricCard
             title="Today's Collection"
-            value={`₹${Math.floor(stats.todaysCollected / 1000)}k`}
-            subtitle={`Target: ₹${Math.floor(stats.totalDueToday / 1000)}k`}
+            value={stats.todaysCollected >= 1000 ? `₹${(stats.todaysCollected / 1000).toFixed(1)}k` : `₹${stats.todaysCollected}`}
+            subtitle={stats.totalDueToday >= 1000 ? `Target: ₹${(stats.totalDueToday / 1000).toFixed(1)}k` : `Target: ₹${stats.totalDueToday.toFixed(0)}`}
             icon={DollarSign}
             trend={{ value: 8, isPositive: true }}
             colorClass="bg-success/10 text-success"
